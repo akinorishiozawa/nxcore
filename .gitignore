@@ -1,0 +1,12 @@
+# Large binary files - track separately if needed
+*.pdf
+*.mp4
+*.mov
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

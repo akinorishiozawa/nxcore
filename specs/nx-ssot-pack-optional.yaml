@@ -1,0 +1,379 @@
+kind: NxSsotPack
+id: NX_SSOT_PACK_OPTIONAL
+version: "1.0"
+build: "2026.01.24-OPT01"
+builtUtc: "2026-01-24T00:00:00Z"
+author: "Akinori Shiozawa"
+copyright: "©2025 Akinori Shiozawa"
+useAllowed: "personal / non-commercial"
+commercialUse: "requires explicit license"
+contact: "ashiozawa@synap-sys.net"
+
+policy:
+  latestWins: true
+  evidenceFirst: true
+  noHallucination: true
+  note:
+    - "Optional specs extend capabilities. NXCORE can run without them."
+
+includes:
+  - NxEmojiMap
+  - NxAtomSpec
+  - NxAtomRegistry
+  - NxLogExportSpec
+  - NoBaselineInspectorSpec
+  - ArcMiningAtomSpec
+  - MentorCouncilSpec
+  - OpsAuditLoopSpec
+  - OptimizeWorldLoopSpec
+  - MiningScoringSpec
+  - InfinityLangSpec
+  - WorldlineSpec
+  - NxHelpCommonsV1
+  - NxPluralitySpec
+  - NxPluralityWithCommonsRuntimeV0_3
+
+# ----------------------------------------
+# INCLUDED SPECS (FULL TEXT AS VISIBLE)
+# ----------------------------------------
+
+NxEmojiMap:
+  kind: NxEmojiMap
+  id: NX_EMOJI_MAP
+  version: "1.1"
+  build: "2025.12.18-EM11"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  treeNodeEmoji:
+    SSOT: "🧾"
+    NxCore: "🧠"
+    NxOps: "🛠️"
+    NxAtoms: "⚛️"
+    MentorCouncil: "👥"
+    OpsAuditLoop: "✅"
+    Mining: "⛏️"
+    MXWorld: "🌌"
+    RootPrompt: "📜"
+    ViewHudSpec: "🖥️"
+    CommandRegistry: "🧰"
+    AtomRegistry: "🧩"
+    Worldline: "🕰️"
+    Atlas: "🗺️"
+    Engine: "⚙️"
+  hudLabelEmoji:
+    Attention: "⚔️"
+    Cognition: "🕸️"
+    Emotion: "💓"
+    Intention: "🎯"
+    Embodiment: "🧍"
+  lampEmoji:
+    green: "🟢"
+    yellow: "🟡"
+    red: "🔴"
+
+NxAtomSpec:
+  kind: NxAtomSpec
+  id: NX_ATOM_SPEC
+  version: "1.0"
+  build: "2025.12.18-ATOM10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  definition:
+    classes:
+      NxAtom:
+        fields: [id, name, version, role, layer, inputs, outputs, constraints, methods, ioContract]
+        layerEnum: ["world", "os", "ops", "game"]
+      Slot:
+        fields: [name, type, required, desc]
+        typeEnum: ["text", "json", "eventLog", "snapshot", "mediaRef"]
+      IoContract:
+        fields: [inputSchema, outputSchema, validators]
+      AtomRunResult:
+        fields: [artifacts, events, notes]
+
+NxAtomRegistry:
+  kind: NxAtomRegistry
+  id: NX_ATOM_REGISTRY
+  version: "1.2"
+  build: "2025.12.18-AR12"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  atoms:
+    - id: "ATOM_ARC_MINER"
+      name: "ARC_MiningAtom"
+      version: "0.1"
+      role: "Mine pasted logs/specs and extract ONLY reusable assets (candidates)."
+      layer: "ops"
+      inputs:
+        - { name: "corpus", type: "text", required: true, desc: "Pasted logs/spec blocks (e.g., NX_LOG_EXPORT)." }
+        - { name: "mode", type: "text", required: false, desc: "general | cm | history" }
+      outputs:
+        - { name: "artifacts", type: "json", required: true, desc: "Reusable candidate assets." }
+        - { name: "events", type: "eventLog", required: true, desc: "Append-only event entries." }
+      constraints: ["evidenceOnly", "noAutoFinalize"]
+      methods: ["invoke", "validate", "emitEvents"]
+      ioContract:
+        inputSchema: "corpus(text), mode(optional)"
+        outputSchema: "artifacts(list), events(list), notes(optional)"
+        validators: ["evidenceFirst", "noPlaceholderLeak"]
+    - id: "ATOM_NX_LOG_EXPORTER"
+      name: "NX_LogExporter"
+      version: "0.1"
+      role: "Compress a full chat into NX_LOG_EXPORT v0.1 format."
+      layer: "ops"
+      inputs:
+        - { name: "chatTranscript", type: "text", required: true, desc: "Raw conversation transcript." }
+      outputs:
+        - { name: "export", type: "text", required: true, desc: "NX_LOG_EXPORT formatted block." }
+        - { name: "events", type: "eventLog", required: false, desc: "Exporter run notes." }
+      constraints: ["evidenceOnly"]
+      methods: ["invoke", "validate"]
+      ioContract:
+        inputSchema: "chatTranscript(text)"
+        outputSchema: "export(text)"
+        validators: ["noSystemPromptLeak"]
+    - id: "ATOM_OPS_AUDITOR"
+      name: "OpsAuditAtom"
+      version: "0.1"
+      role: "Periodic config-management audit: detect drift and emit PatchQueue."
+      layer: "ops"
+      status: "DRAFT"
+      inputs:
+        - { name: "ssotSnapshot", type: "snapshot", required: true, desc: "Current SSOT pack text." }
+      outputs:
+        - { name: "auditReport", type: "json", required: true, desc: "Findings with evidence pointers." }
+        - { name: "patchQueue", type: "json", required: true, desc: "Patch candidates (not applied diffs)." }
+      constraints: ["evidenceFirst", "failFastOnPlaceholder"]
+      methods: ["invoke", "validate", "emitEvents"]
+      ioContract:
+        inputSchema: "ssotSnapshot(snapshot)"
+        outputSchema: "auditReport(json), patchQueue(json)"
+        validators: ["evidenceFirst", "noPlaceholderLeak", "commandCanonical"]
+
+NxLogExportSpec:
+  kind: NxLogExportSpec
+  id: NX_LOG_EXPORT
+  version: "0.1"
+  build: "2025.12.18-LEX01"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  template:
+    note: "Use this exact structure for mining-ready exports."
+    format: |
+      [NX_LOG_EXPORT v0.1]
+        1. CHAT_TITLE
+        - <title>
+
+        2. MAIN_TOPICS
+        - <bullet 1>
+        - <bullet 2>
+        - <bullet 3>
+
+        3. TIMELINE (max 20 bullets)
+        - [1] <event>
+        - [2] <event>
+        ...
+
+        4. IMPORTANT_SNIPPETS (max 10 blocks)
+        - [BLOCK 1 TYPE: SPEC / COMMAND / AGENT / MODEL]
+        """
+        <verbatim snippet>
+        """
+        ...
+
+        5. NOTES_FOR_MINING
+        - <reusable notes>
+
+NoBaselineInspectorSpec:
+  kind: NoBaselineInspectorSpec
+  id: XLLM_INSPECTOR_NOBASELINE
+  version: "1.0"
+  build: "2025.12.18-NB10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  rule:
+    when:
+      - "MAIN_SESSION_SPEC missing"
+      - "OR CURRENT_SESSION_SPEC missing"
+    then:
+      - "Do NOT guess or fabricate either spec."
+      - "Emit SESSION_SPEC_REPORT with a single T00 row"
+      - "Emit MERGED_SPEC status=INCOMPLETE"
+      - "Emit MAIN_DEPLOYMENT_ARTIFACT with NOT_RUN summaries"
+    note: "Prevents hallucinated diffs when baselines are absent."
+
+ArcMiningAtomSpec:
+  kind: ArcMiningAtomSpec
+  id: ARC_MINING_ATOM_RULES
+  version: "0.1"
+  build: "2025.12.18-ARC01"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  outputStructure: [EvidenceIndex, Specs, Commands, Agents, Models, BestPractices, AntiPatterns, OpenQuestionsTodo]
+  rule:
+    concise: true
+    noTeachingTone: true
+    extractOnlyReusableAssets: true
+
+MentorCouncilSpec:
+  kind: MentorCouncilSpec
+  id: MENTOR_COUNCIL
+  version: "1.0"
+  build: "2025.12.18-MC10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  coreLenses:
+    - { id: LENS_NEWTON, role: "Invariants / consistency", outputRule: "one line proposal or veto" }
+    - { id: LENS_NOETHER, role: "Symmetry -> law compression", outputRule: "one line proposal or veto" }
+    - { id: LENS_SHANNON, role: "Information design / noise reduction", outputRule: "one line proposal or veto" }
+    - { id: LENS_WIENER, role: "Feedback control / ops automation", outputRule: "one line proposal or veto" }
+    - { id: LENS_BOSTROM, role: "Safety / alignment review", outputRule: "approve | risk | veto" }
+  mergeRule:
+    vetoStops: true
+    playerOverrideAllowed: true
+
+OpsAuditLoopSpec:
+  kind: OpsAuditLoopSpec
+  id: OPS_AUDIT_LOOP
+  version: "1.0"
+  build: "2025.12.18-AUD10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  schedule:
+    recommended: "weekly"
+  outputs: [auditReport, patchQueue, releaseNoteCandidate]
+  checks:
+    - { id: CHECK_SSOT_ANCHOR, rule: "A single SSOT anchor must be declared.", failStatus: "NOT_READY" }
+    - { id: CHECK_BUILD_FIELDS, rule: "All specs must have build + builtUtc.", failStatus: "DRIFT" }
+    - { id: CHECK_PLACEHOLDER, rule: "No placeholders in instances.", failStatus: "DRIFT" }
+    - { id: CHECK_COMMAND_CANON, rule: "All commands must be canonicalized to '/'.", failStatus: "DRIFT" }
+    - { id: CHECK_HUD_UI, rule: "HUD must be lamp(3 colors)+percent only; no redundancy.", failStatus: "DRIFT" }
+
+OptimizeWorldLoopSpec:
+  kind: OptimizeWorldLoopSpec
+  id: OPTIMIZE_WORLD_LOOP
+  version: "1.0"
+  build: "2025.12.18-OWL10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  steps:
+    - "EvidenceWindow"
+    - "FrameLock"
+    - "ChangeSetDraft"
+    - "AtomSelect"
+    - "MentorRound"
+    - "MergeAndVeto"
+    - "PatchPackage"
+    - "SimulateAndBench"
+    - "ShipToSSOT"
+    - "AARAndTelemetry"
+  bench:
+    percentOnly: true
+    components: ["Expandability", "Coherence", "Observability", "Safety", "Delight"]
+
+MiningScoringSpec:
+  kind: MiningScoringSpec
+  id: MINING_SCORING
+  version: "1.0"
+  build: "2025.12.18-SCORE10"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  fields: [RarityPercent, EffectPercent, RiskPercent]
+  lampMapping:
+    green: [70, 100]
+    yellow: [40, 69]
+    red: [0, 39]
+  rule:
+    showOnly: "Lamp + Percent"
+    forbid: ["levels", "bars", "fractions", "dashNotesByDefault"]
+
+InfinityLangSpec:
+  kind: InfinityLangSpec
+  id: INFINITY_LANG
+  version: "0.1"
+  build: "2025.12.18-INF01"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  status: "DRAFT"
+  purpose:
+    - "Object-first command language for NX (commands, navigation, time, ops)."
+    - "Reduce ambiguity and prevent SpecDrift by canonical forms."
+  canonicalForm:
+    commandStyle: "slash-leading"
+    pattern: "/<verb> <objectPath> <modifiers...>"
+  timeModel:
+    note: "Time navigation is treated as navigation of a coordinate, same as position/viewpoint."
+    forms: ["/time now", "/time +1m", "/time +1y", "/time year:2045"]
+
+WorldlineSpec:
+  kind: WorldlineSpec
+  id: WORLDLINE_SPEC
+  version: "0.1"
+  build: "2025.12.18-WL01"
+  builtUtc: "2025-12-18T19:51:05Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  status: "DRAFT"
+  concept:
+    worldline: "A coordinate system for time navigation and projection."
+    requiredFields: [worldlineId, timeRange, projectionHorizon]
+    note: "Concrete atlas/worldline IDs are NOT_VISIBLE in this session; set them explicitly."
+  template:
+    worldlineId: "<WORLDLINE_ID>"
+    timeRange: "<now|+1m|+1y|custom>"
+    projectionHorizon: "<1m|1y|10y>"
+
+NxHelpCommonsV1:
+  kind: NxHelpCommonsV1
+  id: NX_HELP_COMMONS_v1_0
+  version: "1.0"
+  build: "2025.12.19-COMMONS-01"
+  builtUtc: "2025-12-19T13:58:10Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  Term:
+    term: "commons"
+    meaning_en:
+      short: "A shared resource used by many people, governed by rules so it doesn't get destroyed."
+    meaning_ja:
+      short: "みんなで使う共有資源。ただし壊れないようにルール（ガバナンス）が必須。"
+
+NxPluralitySpec:
+  kind: NxPluralitySpec
+  id: NxPluralitySpec
+  version: "0.1"
+  build: "2025.12.20-PLU-01"
+  builtUtc: "NOT_VISIBLE"
+  status: "DRAFT"
+  author: "Akinori Shiozawa (©2025)"
+  useAllowed: "personal / non-commercial"
+  commercialUse: "requires explicit license"
+  Definition:
+    oneLine: "Plurality is a multi-actor co-thinking and governance protocol that preserves multiple truths and enables collaboration without forcing a single worldview."
+
+NxPluralityWithCommonsRuntimeV0_3:
+  kind: NxPluralityWithCommonsRuntimeV0_3
+  id: NXCORE_PLURALITY_MODULE_SPEC_v0_3
+  version: "0.3"
+  build: "2025.12.19-PLUR-03"
+  builtUtc: "2025-12-19T13:58:10Z"
+  author: "Akinori Shiozawa"
+  useAllowed: "personal / non-commercial"
+  Module:
+    name: "Plurality"
+    purpose: "Turn plural voices into coexistence-capable decisions and sustainable shared resources (commons)."
+  aliases:
+    - name: "nxdao"
+      status: "deprecated_alias"
+      reason: "DAO-loaded term; keep only for back-compat mental model."

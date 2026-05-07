@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1280px; min-height: 720px; font-family: 'Georgia', serif; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; }
+    .bg-image {
+      width: 1280px;
+      height: 720px;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 420px;
+      height: 720px;
+      background: linear-gradient(to right, rgba(0,0,0,0.88) 70%, rgba(0,0,0,0));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 40px 48px 44px;
+    }
+    .slide-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 14px;
+    }
+    .slide-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #FFD700;
+      line-height: 1.25;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: #FFD700;
+      margin-bottom: 20px;
+    }
+    .shadow-block {
+      margin-bottom: 16px;
+    }
+    .block-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 5px;
+    }
+    .block-text {
+      font-size: 13px;
+      color: #e8e0cc;
+      line-height: 1.6;
+    }
+    .command-tag {
+      display: inline-block;
+      background: rgba(201,168,76,0.18);
+      border: 1px solid #c9a84c;
+      color: #FFD700;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      padding: 3px 10px;
+      border-radius: 3px;
+      margin-top: 6px;
+      margin-right: 4px;
+    }
+    .outcome-text {
+      font-size: 14px;
+      color: #ffffff;
+      font-style: italic;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+    .slide-number {
+      position: absolute;
+      bottom: 20px;
+      right: 28px;
+      font-size: 11px;
+      color: rgba(255,215,0,0.5);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <img class="bg-image" src="/home/ubuntu/nxcore_pimp_presentation_diamond/slide_17_image.webp" alt="Memory & Evolution" />
+    <div class="overlay">
+      <div class="slide-label">nxcore — Decision Ledger</div>
+      <div class="slide-title">Memory &<br>Evolution</div>
+      <div class="divider"></div>
+      <div class="shadow-block">
+        <div class="block-label">The Shadow</div>
+        <div class="block-text">AI forgets. Repeats mistakes. No record of what was learned.</div>
+      </div>
+      <div class="shadow-block">
+        <div class="block-label">nxcore Function</div>
+        <div class="block-text">ArcLog records everything. Build on past decisions.</div>
+        <span class="command-tag">ArcLog</span>
+      </div>
+      <div class="shadow-block">
+        <div class="block-label">Outcome</div>
+        <div class="outcome-text">Every decision matters. You evolve. Compound your power.</div>
+      </div>
+    </div>
+    <div class="slide-number">17</div>
+  </div>
+</body>
+</html>

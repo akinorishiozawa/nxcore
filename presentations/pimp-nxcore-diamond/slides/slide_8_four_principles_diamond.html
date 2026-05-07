@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1280px; height: 720px; overflow: hidden; background: #0a0010; }
+    .slide-container { width: 1280px; height: 720px; display: flex; flex-direction: column; }
+
+    /* Top gothic banner ~130px */
+    .top-banner {
+      flex: 0 0 130px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(10,0,20,0.95) 100%);
+      border-bottom: 3px solid #d4a800;
+      padding: 8px 20px 6px;
+      text-align: center;
+    }
+    .chain-border {
+      font-size: 14px; color: #d4a800; letter-spacing: 4px;
+      line-height: 1; margin-bottom: 3px;
+    }
+    .banner-title {
+      font-family: 'UnifrakturMaguntia', 'Times New Roman', serif;
+      font-size: 28px; color: #fff;
+      text-shadow: 0 0 18px #d4a800, 0 0 35px #d4a800;
+      letter-spacing: 2px; line-height: 1.1;
+    }
+    .banner-subtitle {
+      font-family: 'UnifrakturMaguntia', 'Times New Roman', serif;
+      font-size: 20px; color: #d4a800;
+      text-shadow: 0 0 12px #d4a800;
+      letter-spacing: 4px;
+    }
+
+    /* Middle image section ~330px */
+    .image-section {
+      flex: 0 0 330px;
+      overflow: hidden;
+      position: relative;
+    }
+    .image-section img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 20%;
+      display: block;
+    }
+
+    /* Bottom text box ~260px */
+    .bottom-box {
+      flex: 1;
+      background: linear-gradient(180deg, rgba(5,0,15,0.97) 0%, rgba(0,0,0,0.99) 100%);
+      border-top: 2px solid #d4a800;
+      padding: 14px 24px 10px;
+      position: relative;
+    }
+    .slide-title {
+      font-family: 'UnifrakturMaguntia', 'Times New Roman', serif;
+      font-size: 22px; color: #d4a800;
+      text-shadow: 0 0 12px #d4a800;
+      text-align: center; margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .content-columns {
+      display: flex; gap: 20px; height: calc(100% - 50px);
+    }
+    .col {
+      flex: 1;
+      background: rgba(212, 168, 0, 0.06);
+      border: 1px solid rgba(212, 168, 0, 0.3);
+      border-radius: 4px;
+      padding: 10px 14px;
+    }
+    .col-header {
+      font-family: 'Times New Roman', serif;
+      font-size: 13px; font-weight: bold;
+      color: #d4a800; text-transform: uppercase;
+      letter-spacing: 2px; margin-bottom: 6px;
+      border-bottom: 1px solid rgba(212, 168, 0, 0.4);
+      padding-bottom: 4px;
+    }
+    .col-content {
+      font-family: 'Times New Roman', serif;
+      font-size: 13px; color: #e8e0d0;
+      line-height: 1.5;
+    }
+    .col-content ul { padding-left: 14px; }
+    .col-content li { margin-bottom: 3px; }
+    .col-content .highlight { color: #d4a800; font-weight: bold; }
+
+    /* Diamond Edition badge */
+    .diamond-badge {
+      position: absolute; bottom: 12px; right: 16px;
+      background: linear-gradient(135deg, #1a0a00, #3d2000);
+      border: 2px solid #d4a800;
+      border-radius: 6px;
+      padding: 6px 12px;
+      text-align: center;
+    }
+    .diamond-badge .diamond-icon { font-size: 16px; color: #d4a800; }
+    .diamond-badge .badge-text {
+      font-family: 'Times New Roman', serif;
+      font-size: 11px; color: #d4a800;
+      font-style: italic; display: block; line-height: 1.2;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-banner">
+      <div class="chain-border">◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆</div>
+      <div class="banner-title">Personal Intelligence Meta-Processor</div>
+      <div class="banner-subtitle">P.I.M.P. nxcore</div>
+      <div class="chain-border">◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆ ◈ ◆</div>
+    </div>
+
+    <div class="image-section">
+      <img src="/home/ubuntu/nxcore_pimp_presentation_diamond/bg_slide_8.webp" alt="The Four Pillars of the Game" />
+    </div>
+
+    <div class="bottom-box">
+      <div class="slide-title">The Four Pillars of the Game</div>
+      <div class="content-columns">
+        <div class="col">
+          <div class="col-header">🎤 The Shadow (The Problem)</div>
+          <div class="col-content"><ul><li>No framework = no consistency</li><li>Reinventing the wheel every session</li><li>Principles forgotten under pressure</li><li>Chaos masquerading as creativity</li></ul></div>
+        </div>
+        <div class="col">
+          <div class="col-header">💎 The nxcore Solution</div>
+          <div class="col-content"><ul><li><span class='highlight'>Evidence First</span> — facts over assumptions</li><li><span class='highlight'>Structured Output</span> — clean, reusable formats</li><li><span class='highlight'>Drift Detection</span> — catch bias early</li><li><span class='highlight'>ArcLog</span> — full decision memory</li></ul></div>
+        </div>
+      </div>
+      <div class="diamond-badge">
+        <span class="diamond-icon">♦</span>
+        <span class="badge-text">Diamond</span>
+        <span class="badge-text">Edition</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

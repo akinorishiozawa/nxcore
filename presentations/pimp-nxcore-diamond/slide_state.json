@@ -1,0 +1,298 @@
+{
+  "project_info": {
+    "title": "You Spit the Fire. We Lay the Track.",
+    "created": 1768946212.1559007,
+    "last_updated": 1778091856.782659,
+    "total_slides": 19
+  },
+  "slides": [
+    {
+      "id": "slide_1_title_diamond",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_2_rapper_vs_producer_diamond",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_3_what_is_pimp_detailed_english",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_4_prompt_generation_suno_runway",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_3_what_is_pimp_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_4_producer_job_stage",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_5_five_forces_money_liquor",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_4_producer_job_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_5_five_forces_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_10_architect_arsenal_diamond",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_11_cycle_workflow_diamond",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_12_patch_refactor_diamond",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_13_expanding_player_capabilities_diamond",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_14_cognitive_hacking_diamond",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_15_drift_detection_diamond",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_16_seren_shift_diamond",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_17_memory_evolution_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_14_expanding_llm_capabilities_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_6_decision_ledger_diamond",
+      "state": "edited",
+      "pageNum": 12
+    },
+    {
+      "id": "slide_11_play_it_major_playa",
+      "state": "edited",
+      "pageNum": 13
+    },
+    {
+      "id": "slide_7_evidence_first_diamond",
+      "state": "edited",
+      "pageNum": 14
+    },
+    {
+      "id": "slide_8_four_principles_diamond",
+      "state": "edited",
+      "pageNum": 15
+    },
+    {
+      "id": "slide_12_call_to_action_nxcore_fronts",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_9_how_to_use_diamond",
+      "state": "edited",
+      "pageNum": 16
+    },
+    {
+      "id": "slide_12_call_to_action_lowercase_nx",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_10_what_we_hate_diamond",
+      "state": "edited",
+      "pageNum": 17
+    },
+    {
+      "id": "slide_11_bottom_line_diamond",
+      "state": "edited",
+      "pageNum": 18
+    },
+    {
+      "id": "slide_12_call_to_action_diamond",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_12_call_to_action_authentic",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_12_call_to_action_real_snoop",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_12_call_to_action_shaped_snoop",
+      "state": "deleted",
+      "pageNum": -1
+    },
+    {
+      "id": "slide_12_call_to_action_diamond_fronts",
+      "state": "deleted",
+      "pageNum": -1
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_1_title_diamond",
+      "title": "You Spit the Fire. We Lay the Track.",
+      "summary": "Title slide with 50 Cent, Snoop PIMP, Heavy Beat Maker, and sexy staff.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_2_rapper_vs_producer_diamond",
+      "title": "The Rapper vs. The Producer Metaphor",
+      "summary": "Visualizing the metaphor with Heavy Beat Maker on the console.",
+      "image_plan": "/home/ubuntu/nxcore_pimp_presentation_diamond/slide_2_rapper_vs_producer_diamond_generated.webp",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_3_what_is_pimp_detailed_english",
+      "title": "What is P.I.M.P.?",
+      "summary": "Detailed English definition of Personal Intelligence Meta-Processor in Snoop style.",
+      "image_plan": "/home/ubuntu/nxcore_pimp_presentation_diamond/slide_3_what_is_pimp_detailed_english_generated.webp",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_4_prompt_generation_suno_runway",
+      "title": "We Got The Blueprint. You Just Flow.",
+      "summary": "Explaining prompt generation capabilities for Suno and Runway in Snoop style.",
+      "image_plan": "Generate an image of Snoop PIMP character in a high-tech studio, holding a glowing blueprint or tablet, with holographic interfaces showing 'Suno' and 'Runway' logos or icons. He is directing the flow of music and video generation. Gold and futuristic aesthetic.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_6_decision_ledger_diamond",
+      "title": "Every Move is Logged. No Shady Business.",
+      "summary": "Using a platinum record plaque imagery.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11_play_it_major_playa",
+      "title": "Play It Major, Playa",
+      "summary": "Closing with the powerful tagline 'Play It Major, Playa' in PIMP nxcore style.",
+      "image_plan": "/home/ubuntu/nxcore_pimp_presentation_diamond/play_it_major_playa.webp",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_7_evidence_first_diamond",
+      "title": "Real Eyes Realize Real Lies.",
+      "summary": "Highlighting the rule of visible facts with clarity.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_8_four_principles_diamond",
+      "title": "The Four Pillars of the Game",
+      "summary": "Presenting the four core principles with golden pillars.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_9_how_to_use_diamond",
+      "title": "Control the Vibe. Simple Commands.",
+      "summary": "Introducing commands with a gold MPC interface.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10_architect_arsenal_diamond",
+      "title": "The Architect's Arsenal",
+      "summary": "Overview of new commands: /seren, /awaken, /allsight, and /mine.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11_cycle_workflow_diamond",
+      "title": "The Cycle Workflow",
+      "summary": "End-to-end design workflow using /cycle (design, review, debris, standardize, organize).",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_12_patch_refactor_diamond",
+      "title": "Patch & Refactor Flow",
+      "summary": "Structural changes and reviews using /patch, /refactor, and /rv raa.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_13_expanding_player_capabilities_diamond",
+      "title": "Expanding Your Capabilities (The Player's Amp)",
+      "summary": "How nxcore amplifies human intention, giving control, traceability, and structured workflows.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_14_cognitive_hacking_diamond",
+      "title": "Cognitive Hacking (The Meta-Level)",
+      "summary": "Stepping outside your own thought process and observing your thoughts as data.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_15_drift_detection_diamond",
+      "title": "Drift Detection (Catching the Glitch)",
+      "summary": "Identifying cognitive biases and logical fallacies before they impact decisions.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_16_seren_shift_diamond",
+      "title": "The Seren Shift (Forced Perspective)",
+      "summary": "Intentionally breaking out of local optima to force a new perspective.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10_what_we_hate_diamond",
+      "title": "What We Don't Do",
+      "summary": "Contrasting hates vs loves with a boss player attitude.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11_bottom_line_diamond",
+      "title": "The Bottom Line",
+      "summary": "Summarizing the promises with a West Coast sunset.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

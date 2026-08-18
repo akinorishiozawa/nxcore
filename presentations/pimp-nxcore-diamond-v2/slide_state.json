@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "Personal Intelligence Meta-Processor",
+    "created": 1787015620.408,
+    "last_updated": 1787015952.974,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "slide_01_title",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_02_rapper_vs_producer",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_03_what_is_pimp",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_04_kernel_hardening",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_05_evidence_first",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_06_six_shadows",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_07_four_pillars",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_08_thinkcore",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_09_arms",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_10_arc",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_11_force_gates",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_12_closing",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_01_title",
+      "title": "Personal Intelligence Meta-Processor",
+      "summary": "Title slide featuring P.I.M.P. nxcore Diamond Edition branding with the PIMP character in full regalia in a luxury penthouse.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_02_rapper_vs_producer",
+      "title": "The Rapper vs. The Producer",
+      "summary": "Left: Rapper (raw talent, no structure, lost decisions). Right: Producer/PIMP (structured, amplified, governed). The core metaphor of nxcore.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_03_what_is_pimp",
+      "title": "What is P.I.M.P.?",
+      "summary": "P = Personal, I = Intelligence, M = Meta, P = Processor. NXCORE is a governed cognitive OS on top of LLM. External cortex and Intelligence Amplifier for the Player.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_04_kernel_hardening",
+      "title": "The Game Got Rules (KernelHardening)",
+      "summary": "Two unbreakable invariants: 1) Every Decision MUST be persisted. 2) History is append-only — no overwrite, no delete, no mutation.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_05_evidence_first",
+      "title": "Real Eyes Realize Real Lies (EvidenceFirst)",
+      "summary": "No assertion without visible evidence. If not visible in session, output NOT_VISIBLE. No hallucination, no fabrication.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_06_six_shadows",
+      "title": "Six Shadows in the Game",
+      "summary": "Six shadow types that threaten the Player: Cognitive, Governance, Structural, Action, Information, Extractive. Each detected and fixed immediately.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_07_four_pillars",
+      "title": "The Four Pillars of the Game",
+      "summary": "CorePrinciples: HumanPoweredAmp (AI is an amp, we are the signal), PeaceIsPossibleMind, CognitiveRespect, AntiFragileLoop (stress becomes strength).",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_08_thinkcore",
+      "title": "Think Like a Boss (ThinkCore)",
+      "summary": "The thinking pipeline: Spark (detect tension) → Frame (clarify perspective/scope) → Structure (choose skeleton) → Expression (render with evidence).",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_09_arms",
+      "title": "The Arms (Your Toolkit)",
+      "summary": "Executable capabilities: /seren, /awaken, /allsight, /mine, /cycle, /patch, /refactor, /rv, /ops, /quest. One command, one axis.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_10_arc",
+      "title": "The Arc (Your Memory)",
+      "summary": "Single canonical append-only event stream. Tags provide semantic axes. Decisions persist. No cross-session memory loss when persistence is available.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_11_force_gates",
+      "title": "Force & Gates (Quality Control)",
+      "summary": "Force: Audit trail, PatternLedger (best practices + anti-patterns), Gate decisions (COMMITTED/PROVISIONAL/BLOCKED), Sync feedback, Recovery.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "slide_12_closing",
+      "title": "Play It Major, Playa",
+      "summary": "Closing CTA: NXCORE Cognitive OS — AI is an amp; we are the signal. Diamond Edition.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

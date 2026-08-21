@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nxcore OS - Live API</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* macOS Dark Theme */
+      --bg-space: #1e1e1e;
+      --bg-panel: rgba(44, 44, 44, 0.85);
+      --bg-panel-solid: #2c2c2c;
+      --bg-panel-hover: rgba(58, 58, 58, 0.85);
+      --bg-titlebar: rgba(40, 40, 40, 0.95);
+      --accent-blue: #007AFF;
+      --accent-purple: #BF5AF2;
+      --accent-green: #30D158;
+      --accent-red: #FF453A;
+      --accent-yellow: #FFD60A;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.65);
+      --text-dim: rgba(255, 255, 255, 0.4);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(0, 0, 0, 0.5);
+      --traffic-red: #FF5F57;
+      --traffic-yellow: #FFBD2E;
+      --traffic-green: #28C840;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg-space: #f5f5f7;
+        --bg-panel: rgba(255, 255, 255, 0.85);
+        --bg-panel-solid: #ffffff;
+        --bg-panel-hover: rgba(242, 242, 247, 0.85);
+        --bg-titlebar: rgba(250, 250, 250, 0.95);
+        --accent-blue: #007AFF;
+        --accent-purple: #AF52DE;
+        --accent-green: #34C759;
+        --accent-red: #FF3B30;
+        --accent-yellow: #FFCC00;
+        --text-primary: #000000;
+        --text-secondary: rgba(0, 0, 0, 0.65);
+        --text-dim: rgba(0, 0, 0, 0.4);
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow: rgba(0, 0, 0, 0.15);
+        --traffic-red: #FF5F57;
+        --traffic-yellow: #FFBD2E;
+        --traffic-green: #28C840;
+      }
+    }
+
+    :root[data-theme="light"] {
+      --bg-space: #f5f5f7;
+      --bg-panel: rgba(255, 255, 255, 0.85);
+      --bg-panel-solid: #ffffff;
+      --bg-panel-hover: rgba(242, 242, 247, 0.85);
+      --bg-titlebar: rgba(250, 250, 250, 0.95);
+      --accent-blue: #007AFF;
+      --accent-purple: #AF52DE;
+      --accent-green: #34C759;
+      --accent-red: #FF3B30;
+      --accent-yellow: #FFCC00;
+      --text-primary: #000000;
+      --text-secondary: rgba(0, 0, 0, 0.65);
+      --text-dim: rgba(0, 0, 0, 0.4);
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: rgba(0, 0, 0, 0.15);
+      --traffic-red: #FF5F57;
+      --traffic-yellow: #FFBD2E;
+      --traffic-green: #28C840;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+      background: var(--bg-space);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    code, .mono {
+      font-family: 'SF Mono', 'JetBrains Mono', 'Space Mono', monospace;
+    }
+
+    /* macOS Menu Bar */
+    .header {
+      background: var(--bg-titlebar);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.disconnected {
+      background: var(--accent-red);
+      animation: none;
+    }
+
+    .status-dot.connecting {
+      background: var(--accent-yellow);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Command Input */
+    .command-bar {
+      background: var(--bg-titlebar);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    #commandInput {
+      flex: 1;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    #commandInput:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    #sendButton {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #sendButton:hover {
+      background: #0051D5;
+    }
+
+    #sendButton:active {
+      transform: scale(0.98);
+    }
+
+    /* Panels Container */
+    .panels-container {
+      flex: 1;
+      overflow: auto;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 600px;
+    }
+
+    .panel-header {
+      background: var(--bg-titlebar);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-traffic-lights {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .traffic-light.red { background: var(--traffic-red); }
+    .traffic-light.yellow { background: var(--traffic-yellow); }
+    .traffic-light.green { background: var(--traffic-green); }
+
+    .traffic-light:hover { opacity: 0.8; }
+
+    .panel-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .panel-content {
+      padding: 1rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Chat Messages */
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .message-role {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .message.user .message-role {
+      color: var(--accent-blue);
+    }
+
+    .message.assistant .message-role {
+      color: var(--accent-purple);
+    }
+
+    .message-content {
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .message.user .message-content {
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .message.assistant .message-content {
+      border-left: 3px solid var(--accent-purple);
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-badge.success {
+      background: rgba(48, 209, 88, 0.2);
+      color: var(--accent-green);
+    }
+
+    .status-badge.warning {
+      background: rgba(255, 214, 10, 0.2);
+      color: var(--accent-yellow);
+    }
+
+    .status-badge.error {
+      background: rgba(255, 69, 58, 0.2);
+      color: var(--accent-red);
+    }
+
+    /* Metrics */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .metric {
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .metric-unit {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-left: 0.25rem;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.5rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>nxcore OS</span>
+      <span class="mono" style="font-size: 0.75rem; color: var(--text-dim);">v2.7.4</span>
+    </div>
+    <div class="status-indicator">
+      <span class="status-dot" id="wsStatusDot"></span>
+      <span id="wsStatusText">接続中...</span>
+    </div>
+  </div>
+
+  <div class="panels-container" id="panelsContainer"></div>
+
+  <div class="command-bar">
+    <input type="text" id="commandInput" placeholder="コマンドまたは質問を入力... (例: ops all, system status, help)" />
+    <button id="sendButton">送信</button>
+  </div>
+
+  <script>
+    // WebSocket connection
+    let ws = null;
+    let wsReconnectTimer = null;
+    const WS_URL = 'ws://localhost:3000';
+
+    function updateWSStatus(status) {
+      const dot = document.getElementById('wsStatusDot');
+      const text = document.getElementById('wsStatusText');
+
+      dot.className = 'status-dot';
+      if (status === 'connected') {
+        dot.classList.add('connected');
+        text.textContent = 'API接続済み';
+      } else if (status === 'connecting') {
+        dot.classList.add('connecting');
+        text.textContent = '接続中...';
+      } else {
+        dot.classList.add('disconnected');
+        text.textContent = '接続失敗 (サーバーを起動してください)';
+      }
+    }
+
+    function connectWebSocket() {
+      if (ws && ws.readyState === WebSocket.OPEN) return;
+
+      updateWSStatus('connecting');
+
+      try {
+        ws = new WebSocket(WS_URL);
+
+        ws.onopen = () => {
+          console.log('WebSocket connected');
+          updateWSStatus('connected');
+          if (wsReconnectTimer) {
+            clearTimeout(wsReconnectTimer);
+            wsReconnectTimer = null;
+          }
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleWSMessage(data);
+          } catch (error) {
+            console.error('Failed to parse WebSocket message:', error);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          updateWSStatus('disconnected');
+        };
+
+        ws.onclose = () => {
+          console.log('WebSocket disconnected');
+          updateWSStatus('disconnected');
+          ws = null;
+
+          // Attempt reconnect after 5 seconds
+          wsReconnectTimer = setTimeout(connectWebSocket, 5000);
+        };
+      } catch (error) {
+        console.error('Failed to create WebSocket:', error);
+        updateWSStatus('disconnected');
+      }
+    }
+
+    let currentStreamingMessage = null;
+
+    function handleWSMessage(data) {
+      if (data.type === 'status' && data.status === 'processing') {
+        // Show processing indicator
+        currentStreamingMessage = null;
+      } else if (data.type === 'stream') {
+        // Stream response
+        if (!currentStreamingMessage) {
+          currentStreamingMessage = addMessage('assistant', data.partial);
+        } else {
+          updateMessage(currentStreamingMessage, data.partial);
+        }
+      } else if (data.type === 'complete') {
+        // Complete response
+        if (currentStreamingMessage) {
+          updateMessage(currentStreamingMessage, data.text);
+        } else {
+          addMessage('assistant', data.text);
+        }
+        currentStreamingMessage = null;
+      } else if (data.type === 'error') {
+        addMessage('assistant', `エラー: ${data.error}`);
+        currentStreamingMessage = null;
+      }
+    }
+
+    function sendToAPI(message) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        addMessage('assistant', 'API接続がありません。サーバーを起動してください。\n\n```bash\ncd api\nnpm start\n```');
+        return false;
+      }
+
+      ws.send(JSON.stringify({
+        type: 'chat',
+        message: message
+      }));
+      return true;
+    }
+
+    // Panel management
+    function createPanel(title, content) {
+      const panelId = `panel-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.id = panelId;
+      panel.innerHTML = `
+        <div class="panel-header">
+          <div class="panel-traffic-lights">
+            <button class="traffic-light red" onclick="closePanel('${panelId}')"></button>
+            <button class="traffic-light yellow"></button>
+            <button class="traffic-light green"></button>
+          </div>
+          <div class="panel-title">${title}</div>
+          <div style="width: 3rem;"></div>
+        </div>
+        <div class="panel-content">${content}</div>
+      `;
+      return panel;
+    }
+
+    function closePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.style.opacity = '0';
+        setTimeout(() => panel.remove(), 200);
+      }
+    }
+
+    // Commands
+    const commands = {
+      'ops all': () => `
+        <h3 style="margin-bottom: 1rem; color: var(--accent-purple);">LLMOps 4層アーキテクチャ</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <h4 style="color: var(--accent-blue); margin-bottom: 0.5rem;">Layer 1: Execution</h4>
+            <div class="metrics-grid">
+              <div class="metric">
+                <div class="metric-label">LangChain</div>
+                <div class="metric-value">98<span class="metric-unit">%</span></div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">vLLM</div>
+                <div class="metric-value">45<span class="metric-unit">req/s</span></div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Dify</div>
+                <div class="metric-value">12<span class="metric-unit">agents</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <h4 style="color: var(--accent-green); margin-bottom: 0.5rem;">Layer 2: Knowledge</h4>
+            <div class="metrics-grid">
+              <div class="metric">
+                <div class="metric-label">RAG Docs</div>
+                <div class="metric-value">2.4<span class="metric-unit">K</span></div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">KG Nodes</div>
+                <div class="metric-value">18<span class="metric-unit">K</span></div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">PostgreSQL</div>
+                <div class="metric-value">156<span class="metric-unit">MB</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <h4 style="color: var(--accent-yellow); margin-bottom: 0.5rem;">Layer 3: Safety</h4>
+            <div class="metrics-grid">
+              <div class="metric">
+                <div class="metric-label">Guardrails</div>
+                <div class="metric-value">100<span class="metric-unit">%</span></div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Ragas Score</div>
+                <div class="metric-value">0.94</div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <h4 style="color: var(--accent-purple); margin-bottom: 0.5rem;">Layer 4: Observation</h4>
+            <div class="metrics-grid">
+              <div class="metric">
+                <div class="metric-label">Portkey</div>
+                <div class="metric-value">Active</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Latency</div>
+                <div class="metric-value">234<span class="metric-unit">ms</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      'system status': () => `
+        <div class="metrics-grid">
+          <div class="metric">
+            <div class="metric-label">CPU</div>
+            <div class="metric-value">42<span class="metric-unit">%</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Memory</div>
+            <div class="metric-value">8.2<span class="metric-unit">GB</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Uptime</div>
+            <div class="metric-value">72<span class="metric-unit">h</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Processes</div>
+            <div class="metric-value">24</div>
+          </div>
+        </div>
+      `,
+      'thinking show': () => `
+        <h3 style="margin-bottom: 1rem; color: var(--accent-blue);">ThinkingPipeline</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--bg-panel-solid); border-left: 3px solid var(--accent-purple); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--accent-purple);">1. Spark（発火）</strong>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary); line-height: 1.6;">問題の認識と動機付け。ユーザーの質問から核心的な課題を抽出し、思考の出発点を設定します。</p>
+          </div>
+          <div style="background: var(--bg-panel-solid); border-left: 3px solid var(--accent-blue); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--accent-blue);">2. Frame（枠組み）</strong>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary); line-height: 1.6;">問題の構造化と視点の設定。制約条件、前提、スコープを明確化します。</p>
+          </div>
+          <div style="background: var(--bg-panel-solid); border-left: 3px solid var(--accent-green); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--accent-green);">3. Structure（構造）</strong>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary); line-height: 1.6;">論理的な分析と解決策の構築。情報を整理し、アプローチを設計します。</p>
+          </div>
+          <div style="background: var(--bg-panel-solid); border-left: 3px solid var(--accent-yellow); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--accent-yellow);">4. Expression（表現）</strong>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary); line-height: 1.6;">最適な形式での出力。OutputContractに従い、構造化された回答を生成します。</p>
+          </div>
+        </div>
+      `,
+      'memory browse': () => `
+        <h3 style="margin-bottom: 1rem;">メモリ統計</h3>
+        <table>
+          <tr>
+            <th>Type</th>
+            <th>Count</th>
+            <th>Size</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>RAG Documents</td>
+            <td>2,421</td>
+            <td>1.2 GB</td>
+            <td><span class="status-badge success">Active</span></td>
+          </tr>
+          <tr>
+            <td>Knowledge Graph</td>
+            <td>18,347 nodes</td>
+            <td>456 MB</td>
+            <td><span class="status-badge success">Active</span></td>
+          </tr>
+          <tr>
+            <td>PostgreSQL</td>
+            <td>124 tables</td>
+            <td>156 MB</td>
+            <td><span class="status-badge success">Active</span></td>
+          </tr>
+          <tr>
+            <td>S3 Storage</td>
+            <td>8,902 objects</td>
+            <td>24.3 GB</td>
+            <td><span class="status-badge success">Synced</span></td>
+          </tr>
+        </table>
+      `,
+      'files list': () => `
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Modified</th>
+          </tr>
+          <tr>
+            <td>/core</td>
+            <td>directory</td>
+            <td>2 hours ago</td>
+          </tr>
+          <tr>
+            <td>/arc</td>
+            <td>directory</td>
+            <td>1 day ago</td>
+          </tr>
+          <tr>
+            <td>README.md</td>
+            <td>markdown</td>
+            <td>3 days ago</td>
+          </tr>
+          <tr>
+            <td>system-design.md</td>
+            <td>markdown</td>
+            <td>1 week ago</td>
+          </tr>
+        </table>
+      `,
+      'processes': () => `
+        <table>
+          <tr>
+            <th>PID</th>
+            <th>Process</th>
+            <th>CPU</th>
+            <th>Memory</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>1001</td>
+            <td>nxcore.kernel</td>
+            <td>12%</td>
+            <td>2.1 GB</td>
+            <td><span class="status-badge success">Running</span></td>
+          </tr>
+          <tr>
+            <td>1002</td>
+            <td>thinking.pipeline</td>
+            <td>8%</td>
+            <td>1.4 GB</td>
+            <td><span class="status-badge success">Running</span></td>
+          </tr>
+          <tr>
+            <td>1003</td>
+            <td>memory.manager</td>
+            <td>5%</td>
+            <td>845 MB</td>
+            <td><span class="status-badge success">Running</span></td>
+          </tr>
+          <tr>
+            <td>1004</td>
+            <td>decision.logger</td>
+            <td>2%</td>
+            <td>234 MB</td>
+            <td><span class="status-badge success">Running</span></td>
+          </tr>
+        </table>
+      `,
+      'decision history': () => `
+        <h3 style="margin-bottom: 1rem;">DecisionState Audit Log</h3>
+        <div style="font-family: 'SF Mono', monospace; font-size: 0.8rem;">
+          <div style="background: var(--bg-panel-solid); padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 6px;">
+            <div style="color: var(--accent-green);">Hash: 0xaf42c8d9e1b3...</div>
+            <div style="color: var(--text-secondary); margin-top: 0.25rem;">Action: Execute ThinkingPipeline</div>
+            <div style="color: var(--text-dim); font-size: 0.75rem; margin-top: 0.25rem;">2024-08-21 14:32:15</div>
+          </div>
+          <div style="background: var(--bg-panel-solid); padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 6px;">
+            <div style="color: var(--accent-green);">Hash: 0x3f8a9cb2d5e7...</div>
+            <div style="color: var(--text-secondary); margin-top: 0.25rem;">Action: Update Memory Context</div>
+            <div style="color: var(--text-dim); font-size: 0.75rem; margin-top: 0.25rem;">2024-08-21 14:28:42</div>
+          </div>
+          <div style="background: var(--bg-panel-solid); padding: 0.75rem; border-radius: 6px;">
+            <div style="color: var(--accent-green);">Hash: 0x7d1e4f9a6b2c...</div>
+            <div style="color: var(--text-secondary); margin-top: 0.25rem;">Action: Load RAG Documents</div>
+            <div style="color: var(--text-dim); font-size: 0.75rem; margin-top: 0.25rem;">2024-08-21 14:25:03</div>
+          </div>
+        </div>
+      `,
+      'help': () => `
+        <h3 style="margin-bottom: 1rem;">利用可能なコマンド</h3>
+        <table>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><code>ops all</code></td>
+            <td>LLMOps 4層アーキテクチャの全体状態</td>
+          </tr>
+          <tr>
+            <td><code>system status</code></td>
+            <td>システムリソースの状態</td>
+          </tr>
+          <tr>
+            <td><code>thinking show</code></td>
+            <td>ThinkingPipeline の詳細</td>
+          </tr>
+          <tr>
+            <td><code>memory browse</code></td>
+            <td>メモリ統計情報</td>
+          </tr>
+          <tr>
+            <td><code>files list</code></td>
+            <td>ファイル一覧</td>
+          </tr>
+          <tr>
+            <td><code>processes</code></td>
+            <td>実行中のプロセス</td>
+          </tr>
+          <tr>
+            <td><code>decision history</code></td>
+            <td>意思決定の履歴</td>
+          </tr>
+          <tr>
+            <td><code>clear</code></td>
+            <td>全パネルをクリア</td>
+          </tr>
+          <tr>
+            <td><code>help</code></td>
+            <td>このヘルプを表示</td>
+          </tr>
+        </table>
+        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-panel-solid); border-radius: 6px; color: var(--text-secondary);">
+          <strong>その他の入力:</strong> コマンド以外の入力は、Claude APIを通じてAI会話として処理されます。
+        </div>
+      `
+    };
+
+    function executeCommand(cmdText) {
+      if (!cmdText.trim()) return;
+
+      const originalText = cmdText.trim();
+      const cmd = originalText.toLowerCase();
+
+      // Add user message
+      addMessage('user', originalText);
+
+      // Check if it's a known command
+      if (commands[cmd]) {
+        const content = commands[cmd]();
+        const title = originalText.toUpperCase();
+        const panel = createPanel(title, content);
+        document.getElementById('panelsContainer').appendChild(panel);
+
+        // Add assistant response
+        addMessage('assistant', `"${originalText}" の結果をパネルに表示しました。`);
+      } else if (cmd === 'clear') {
+        document.getElementById('panelsContainer').innerHTML = '';
+        addMessage('assistant', 'すべてのパネルをクリアしました。');
+      } else {
+        // Treat as AI conversation - send to API
+        sendToAPI(originalText);
+      }
+
+      document.getElementById('commandInput').value = '';
+    }
+
+    // Chat panel management
+    let chatPanelId = null;
+
+    function createChatPanel() {
+      if (chatPanelId && document.getElementById(chatPanelId)) {
+        return;
+      }
+
+      chatPanelId = `panel-chat`;
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.id = chatPanelId;
+      panel.innerHTML = `
+        <div class="panel-header">
+          <div class="panel-traffic-lights">
+            <button class="traffic-light red" onclick="closeChatPanel()"></button>
+            <button class="traffic-light yellow"></button>
+            <button class="traffic-light green"></button>
+          </div>
+          <div class="panel-title">対話履歴</div>
+          <div style="width: 3rem;"></div>
+        </div>
+        <div class="panel-content">
+          <div class="chat-messages" id="chatMessages">
+            <div class="message assistant">
+              <div class="message-role">nxcore</div>
+              <div class="message-content">nxcore OS へようこそ。コマンド実行や対話ができます。"help" で利用可能なコマンドを確認できます。
+
+WebSocket APIサーバーに接続してリアルタイムAI会話を利用できます。</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('panelsContainer').insertBefore(panel, document.getElementById('panelsContainer').firstChild);
+    }
+
+    function closeChatPanel() {
+      if (chatPanelId) {
+        closePanel(chatPanelId);
+        chatPanelId = null;
+      }
+    }
+
+    function addMessage(role, content) {
+      if (!chatPanelId || !document.getElementById(chatPanelId)) {
+        createChatPanel();
+      }
+
+      const messagesContainer = document.getElementById('chatMessages');
+      if (!messagesContainer) return;
+
+      const message = document.createElement('div');
+      message.className = `message ${role}`;
+      message.innerHTML = `
+        <div class="message-role">${role === 'user' ? 'あなた' : 'nxcore'}</div>
+        <div class="message-content">${content}</div>
+      `;
+      messagesContainer.appendChild(message);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      return message;
+    }
+
+    function updateMessage(messageElement, content) {
+      if (!messageElement) return;
+
+      const contentDiv = messageElement.querySelector('.message-content');
+      if (contentDiv) {
+        contentDiv.textContent = content;
+      }
+
+      const messagesContainer = document.getElementById('chatMessages');
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+
+    // Command input handlers
+    document.getElementById('commandInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        executeCommand(e.target.value);
+      }
+    });
+
+    document.getElementById('sendButton').addEventListener('click', () => {
+      const input = document.getElementById('commandInput');
+      executeCommand(input.value);
+    });
+
+    // Initial setup
+    window.addEventListener('load', () => {
+      createChatPanel();
+      connectWebSocket();
+    });
+  </script>
+</body>
+</html>

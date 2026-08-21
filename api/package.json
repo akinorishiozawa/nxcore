@@ -1,0 +1,27 @@
+{
+  "name": "nxcore-chat-server",
+  "version": "1.0.0",
+  "description": "WebSocket server for nxcore OS real-time LLM conversation",
+  "main": "nxcore-chat-server.js",
+  "scripts": {
+    "start": "node nxcore-chat-server.js",
+    "dev": "nodemon nxcore-chat-server.js"
+  },
+  "keywords": [
+    "nxcore",
+    "websocket",
+    "claude",
+    "llm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

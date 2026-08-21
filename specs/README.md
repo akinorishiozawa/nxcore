@@ -9,6 +9,7 @@
 | nx-ssot-pack-optional.yaml | 1.0 | 2026-01-24 | superseded |
 | os-monitoring-spec.yaml | 1.1 | 2026-02-09 | superseded |
 | ../README.md (ROOT PROMPT) | 2.7.4 | 2026-02-11 | superseded |
+| ../docs/system-design.md（4層OSS案） | v2.4時点 | — | superseded（SSOT v3.10.02に不在の旧設計案） |
 
 **Current canonical SSOT**: `SSOT_BLUEPRINT_ALL v3.10.02` (builtUtc
 2026-08-21T02:00:35.348Z) — live copy is maintained in the `nxcore_dev`

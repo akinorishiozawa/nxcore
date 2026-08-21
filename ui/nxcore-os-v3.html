@@ -741,10 +741,9 @@ Answer | Artifact | NextActions
             <div class="stage-card">
               <div class="stage-header"><div class="stage-name">可視ランタイムレシート</div></div>
               <div class="stage-detail">
-                Kernel: ${health.service} v${health.version}<br>
+                Kernel: ${health.service} (${health.status})<br>
                 Timestamp: ${health.timestamp}<br>
-                Arc entries: ${arc ? arc.entryCount : 'NOT_VISIBLE'}<br>
-                Arc path: ${health.arcPath}
+                Arc entries: ${arc ? arc.entryCount : 'NOT_VISIBLE'}
               </div>
             </div>`;
         } catch (_) { /* keep NOT_VISIBLE receipt */ }
@@ -752,22 +751,25 @@ Answer | Artifact | NextActions
         return `
           ${kernelReceipts}
           <div class="stage-card">
-            <div class="stage-header"><div class="stage-icon frame">1</div><div class="stage-name">Execution</div></div>
-            <div class="stage-detail">Anthropic API（Kernel経由） / LangChain, vLLM, Dify: 未接続 → NOT_VISIBLE</div>
+            <div class="stage-header"><div class="stage-icon frame">A</div><div class="stage-name">Arms — act（実行）</div></div>
+            <div class="stage-detail">Command router: quest, think, arc, decision, ops, help</div>
           </div>
           <div class="stage-card">
-            <div class="stage-header"><div class="stage-icon structure">2</div><div class="stage-name">Knowledge</div></div>
-            <div class="stage-detail">Arc JSONL stream / RAG, KG, PostgreSQL, S3: 未接続 → NOT_VISIBLE</div>
+            <div class="stage-header"><div class="stage-icon structure">A</div><div class="stage-name">Arc — records（記録）</div></div>
+            <div class="stage-detail">Append-only JSONL + commandReceipt + prev_hashチェーン</div>
           </div>
           <div class="stage-card">
-            <div class="stage-header"><div class="stage-icon expression">3</div><div class="stage-name">Safety</div></div>
-            <div class="stage-detail">Evidence-first guard / Guardrails, Ragas: 未接続 → NOT_VISIBLE</div>
+            <div class="stage-header"><div class="stage-icon expression">T</div><div class="stage-name">Tags — interpret（意味づけ）</div></div>
+            <div class="stage-detail">Arcエントリのtags/subtags軸</div>
           </div>
           <div class="stage-card">
-            <div class="stage-header"><div class="stage-icon spark">4</div><div class="stage-name">Observation</div></div>
-            <div class="stage-detail">Arc commandReceipt / Portkey: 未接続 → NOT_VISIBLE</div>
+            <div class="stage-header"><div class="stage-icon spark">P</div><div class="stage-name">Profile / Mode</div></div>
+            <div class="stage-detail">このkernelでは未実装 → NOT_VISIBLE</div>
           </div>
-          <div class="stage-detail" style="margin-top:0.5rem;">レイヤー構成は設計リファレンス（静的）。実測値は可視レシートのみ表示。</div>`;
+          <div class="stage-detail" style="margin-top:0.5rem;">
+            governedBy優先順位: invariants → authority → safety → consent → review → evidence → audit。
+            実測値は可視レシートのみ表示（SSOT v3.10.02）。
+          </div>`;
       }
     };
 

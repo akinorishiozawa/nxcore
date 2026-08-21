@@ -61,7 +61,7 @@ Built-in commands per `Arms.entries` (accepted as `/cmd` or host-local `-cmd`):
 - `/think` - Execute ThinkCore pipeline explicitly
 - `/arc` - View Arc event stream
 - `/decision` - View DecisionState history
-- `/ops` - LLMOps layer reference + runtime-visible receipts (unconnected layers render NOT_VISIBLE)
+- `/ops` - CoreModel status (Arms/Arc/Tags/Profile/Mode) + runtime-visible receipts (unimplemented surfaces render NOT_VISIBLE)
 - `/help` - Command table generated from Arms.entries
 
 ### Evidence-First Principle
@@ -173,30 +173,52 @@ Error:
 
 ### HTTP: `GET /health`
 
-Health check endpoint:
+Health check endpoint. Per `OutputContract.publicArtifactFinalization`,
+public JSON uses an allowlist projection — SSOT version, kernel release,
+model name, and local file paths are forbidden public content and stay on
+the Player-facing WS surface (`/ops`):
 
 ```json
 {
   "status": "ok",
   "service": "nxcore-kernel-server",
-  "version": "3.10.02",
-  "kernelRelease": "nxcore-kernel-v3.10.02",
-  "timestamp": "2026-08-21T...",
-  "arcPath": "./arc/arc_stream_2026-08-21.jsonl"
+  "timestamp": "2026-08-21T..."
 }
 ```
 
 ### HTTP: `GET /arc/stream`
 
-Read Arc event stream (last 100 entries):
+Read Arc event stream (last 100 entries, audience-safe projection —
+payloads and paths are never exposed):
 
 ```json
 {
-  "streamPath": "./arc/arc_stream_2026-08-21.jsonl",
   "entryCount": 42,
-  "entries": [...]
+  "entries": [
+    { "timestamp": "...", "action": "command_receipt", "tags": ["command", "arms", "receipt"] }
+  ]
 }
 ```
+
+## Execution Topology (ThinkCore.modeRouter)
+
+The mode router runs before every command dispatch and records the adopted
+execution topology in the command receipt:
+
+- `adoptedMode: parallel` (`defaultModePolicy` — parallel for all Player requests)
+- `adoptionPath: routerDefault`
+- `topologyReceipt.executorType: mode_unavailable` — this kernel is a single
+  process with no branch capability, so no concurrency is claimed
+  (capabilityRule: unavailable capability MUST NOT be presented as actual
+  sub-agent execution)
+
+## Command Receipts (Arc.commandReceipt)
+
+Every command invocation appends a receipt with the required fields
+`receipt_id`, `timestamp_utc`, `command_ref`, `adoptedMode`, `adoptionPath`,
+`gateDecision`, `evidenceRefs`, plus `topologyReceipt` (required whenever
+`adoptedMode != single`). The Arc stream itself maintains a sha256
+`prev_hash` chain across entries (`Arc.streamShape.prevHash`).
 
 ## Arc Storage
 

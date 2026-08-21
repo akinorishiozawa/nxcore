@@ -50,8 +50,28 @@ async function ensureArcDir() {
 }
 
 // Arc append-only logger (KernelHardening.invariant2)
+// prev_hash chain: Arc.streamShape.prevHash is sha256 with
+// chain "enabled_when_external_runtime_supports_hashing" — Node supports
+// hashing, so each entry carries the sha256 of the previous entry line.
+let arcLastHash = null;
+let arcChainReady = false;
+
+async function initArcChain() {
+  if (arcChainReady) return;
+  try {
+    const content = await fs.readFile(ARC_STREAM_PATH, 'utf8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    if (lines.length > 0) {
+      arcLastHash = crypto.createHash('sha256')
+        .update(lines[lines.length - 1]).digest('hex');
+    }
+  } catch (_) { /* no stream yet: chain starts at null */ }
+  arcChainReady = true;
+}
+
 async function appendToArc(entry) {
   try {
+    await initArcChain();
     const timestamp = new Date().toISOString();
     const arcEntry = {
       timestamp,
@@ -62,7 +82,7 @@ async function appendToArc(entry) {
       tags: entry.tags || [],
       subtags: entry.subtags || [],
       refs: entry.refs || [],
-      prev_hash: entry.prev_hash || null,
+      prev_hash: arcLastHash,
       schema_version: 'v1',
       content_provenance: {
         origin: entry.origin || 'NOT_VISIBLE',
@@ -71,13 +91,64 @@ async function appendToArc(entry) {
       }
     };
 
-    const line = JSON.stringify(arcEntry) + '\n';
-    await fs.appendFile(ARC_STREAM_PATH, line, 'utf8');
+    const line = JSON.stringify(arcEntry);
+    await fs.appendFile(ARC_STREAM_PATH, line + '\n', 'utf8');
+    arcLastHash = crypto.createHash('sha256').update(line).digest('hex');
     return arcEntry;
   } catch (error) {
     console.error('Arc append failed:', error);
     return null;
   }
+}
+
+// ModeRouter (ThinkCore.modeRouter): single control point for execution
+// topology, run before command dispatch. defaultModePolicy adopts parallel
+// for every Player request; this kernel is a single process with no branch
+// capability, so the topology receipt records that honestly instead of
+// claiming concurrency (capabilityRule: no false concurrency claims).
+const ModeRouter = {
+  select() {
+    return {
+      adoptedMode: 'parallel',
+      adoptionPath: 'routerDefault',
+      topologyReceipt: {
+        executorType: 'mode_unavailable',
+        runtime: 'nxcore-kernel-server single process',
+        branchCount: 0,
+        branchReceipts: [],
+        fanInOrder: 'NOT_VISIBLE',
+        concurrency: 0,
+        executionCapability: 'no_branch_capability',
+        semanticWorkPerformed: 'parent_path_only'
+      }
+    };
+  }
+};
+
+// Arc.commandReceipt: required fields receipt_id, timestamp_utc,
+// command_ref, adoptedMode, adoptionPath, gateDecision, evidenceRefs.
+// topologyReceipt is required whenever adoptedMode != single.
+async function writeCommandReceipt(commandRef, modeSelection, extra = {}) {
+  const receipt = {
+    receipt_id: crypto.randomUUID(),
+    timestamp_utc: new Date().toISOString(),
+    command_ref: commandRef,
+    adoptedMode: modeSelection.adoptedMode,
+    adoptionPath: modeSelection.adoptionPath,
+    gateDecision: extra.gateDecision || 'pass',
+    evidenceRefs: extra.evidenceRefs || [],
+    topologyReceipt: modeSelection.topologyReceipt
+  };
+
+  await appendToArc({
+    action: 'command_receipt',
+    payload: receipt,
+    tags: ['command', 'arms', 'receipt'],
+    subtags: [modeSelection.adoptedMode],
+    origin: 'player'
+  });
+
+  return receipt;
 }
 
 // DecisionState tracking (KernelHardening.invariant1)
@@ -457,13 +528,8 @@ async function handleCommand(ws, route) {
       response = `Command "${command}" は認識されましたが、実装されていません。`;
   }
 
-  // Log command execution to Arc
-  await appendToArc({
-    action: 'command_executed',
-    payload: { command, args, entry_id: entry.id },
-    tags: ['command', 'arms'],
-    origin: 'player'
-  });
+  // Arc.commandReceipt for this invocation (modeRouter runs before dispatch)
+  await writeCommandReceipt(`Arms.entries[id=${entry.id}]`, ModeRouter.select());
 
   ws.send(JSON.stringify({
     type: 'complete',
@@ -571,7 +637,7 @@ async function executeOpsCommand(args) {
     arcEntryCount = String(content.trim().split('\n').filter(Boolean).length);
   } catch (_) { /* Arc file absent: keep NOT_VISIBLE */ }
 
-  return `# LLMOps Status (${args || 'all'})
+  return `# NXCORE Ops Status (${args || 'all'})
 
 ## 可視ランタイムレシート（このプロセスの実測値）
 - Kernel: nxcore-kernel-server v${SSOT_VERSION}
@@ -580,14 +646,20 @@ async function executeOpsCommand(args) {
 - LLM Host: claude-sonnet-4-5-20250929 (Anthropic API)
 - Arc entries (today): ${arcEntryCount}
 - Arc path: ${ARC_STREAM_PATH}
+- Arc prev_hash chain: ${arcLastHash ? 'active (sha256)' : 'empty stream'}
+- ModeRouter: adoptedMode=parallel (routerDefault) / branch capability: none (single process)
 
-## レイヤー構成（設計リファレンス — 静的）
-1. **Execution**: Anthropic API (active) / LangChain, vLLM, Dify (未接続 → NOT_VISIBLE)
-2. **Knowledge**: Arc JSONL stream (active) / RAG, KG, PostgreSQL, S3 (未接続 → NOT_VISIBLE)
-3. **Safety**: Evidence-first guard (active) / Guardrails, Ragas (未接続 → NOT_VISIBLE)
-4. **Observation**: Arc commandReceipt (active) / Portkey (未接続 → NOT_VISIBLE)
+## CoreModel構成（SSOT v${SSOT_VERSION}）
+- **Arms** act（実行）: command router — quest, think, arc, decision, ops, help
+- **Arc** records（記録）: append-only JSONL + commandReceipt + prev_hashチェーン
+- **Tags** interpret（意味づけ）: Arcエントリのtags/subtags
+- **Profile** defines identity / **Mode** controls behavior: このkernelでは未実装 → NOT_VISIBLE
 
-外部レイヤーの実測値は、該当サービスへの接続レシートが可視になるまで NOT_VISIBLE です。`;
+## governedBy優先順位（衝突時は上位が勝つ）
+invariants → authority → safety → consent → review → evidence → audit
+
+このkernelで能動なのは invariants（append-only強制）と evidence（NOT_VISIBLE規律）のみ。
+safety / consent / review の各ゲートは未実装 → NOT_VISIBLE。`;
 }
 
 // help: generated from ARMS_ENTRIES so the table cannot drift from the router.
@@ -672,34 +744,38 @@ async function handleConversation(ws, userMessage) {
   }
 }
 
-// Health check endpoint
+// Health check endpoint.
+// OutputContract.publicArtifactFinalization: public_json payloads use an
+// allowlist projection — SSOT version, builtUtc, model name, kernel release,
+// and local file paths are forbidden public content. Version and Arc details
+// stay on the Player-facing WS surface (/ops).
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'nxcore-kernel-server',
-    version: SSOT_VERSION,
-    kernelRelease: KERNEL_RELEASE,
-    timestamp: new Date().toISOString(),
-    arcPath: ARC_STREAM_PATH
+    timestamp: new Date().toISOString()
   });
 });
 
-// Arc endpoint (read-only)
+// Arc endpoint (read-only).
+// publicArtifactFinalization projection: raw payloads (may contain prompts)
+// and local paths never enter the public_json response — only aggregate
+// counts and audience-safe per-entry fields (timestamp, action, tags).
 app.get('/arc/stream', async (req, res) => {
   try {
     const content = await fs.readFile(ARC_STREAM_PATH, 'utf8');
-    const entries = content.trim().split('\n').map(line => JSON.parse(line));
+    const entries = content.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
 
     res.json({
-      streamPath: ARC_STREAM_PATH,
       entryCount: entries.length,
-      entries: entries.slice(-100) // Last 100 entries
+      entries: entries.slice(-100).map(e => ({
+        timestamp: e.timestamp,
+        action: e.action,
+        tags: e.tags
+      }))
     });
   } catch (error) {
-    res.status(404).json({
-      error: 'Arc stream not found',
-      streamPath: ARC_STREAM_PATH
-    });
+    res.status(404).json({ error: 'Arc stream not found' });
   }
 });
 

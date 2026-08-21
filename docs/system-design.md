@@ -1,5 +1,11 @@
 # NxCore System Design
 
+> **SUPERSEDED**: この設計書はNxCore Root Prompt v2.4時点のスナップショットです。
+> 現行の正準仕様は SSOT_BLUEPRINT_ALL v3.10.02（latestWins）。本書の
+> 「4層アーキテクチャ」（LangChain / vLLM / Dify / Portkey / Ragas等）は
+> v3.10.02のSSOTには存在しない旧設計案であり、実装要件ではありません。
+> 版状態の一覧は `specs/README.md` を参照。本文はappend-only原則で保持。
+
 NxCoreを中心としたAIシステム全体のアーキテクチャ設計書。
 各コンポーネントを「製品名くん」方式で整理し、役割・責務・関係性を明確にする。
 

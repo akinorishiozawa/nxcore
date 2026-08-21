@@ -414,7 +414,7 @@
     <input
       type="text"
       id="commandInput"
-      placeholder="コマンドまたは質問を入力... (/quest, /think, /arc, /decision)"
+      placeholder="コマンドまたは質問を入力... (/quest, /think, /ops all, /arc, /decision, /help)"
     />
     <button id="sendButton">送信</button>
   </div>
@@ -506,8 +506,8 @@ Answer | Artifact | NextActions
 
 ## Next Actions
 - /quest - 対話を開始
-- /think - ThinkCore実行
-- /arc - Arcストリーム表示`);
+- /ops all - LLMOps状態表示
+- /help - コマンド一覧`);
     }
 
     let currentStreamingMessage = null;
@@ -723,15 +723,80 @@ Answer | Artifact | NextActions
       sendCommand();
     }
 
-    function sendCommand() {
+    // Local fallback panels — rendered client-side so the UI stays usable
+    // when the kernel is unreachable. Live metrics the browser cannot
+    // observe render as NOT_VISIBLE (evidence-first), never as invented numbers.
+    const KERNEL_HTTP = 'http://localhost:3000';
+
+    const LOCAL_COMMANDS = {
+      'ops all': async () => {
+        let kernelReceipts = `
+          <div class="stage-card">
+            <div class="stage-detail">Kernel未接続 — ランタイム実測値は NOT_VISIBLE</div>
+          </div>`;
+        try {
+          const health = await (await fetch(`${KERNEL_HTTP}/health`)).json();
+          const arc = await (await fetch(`${KERNEL_HTTP}/arc/stream`)).json().catch(() => null);
+          kernelReceipts = `
+            <div class="stage-card">
+              <div class="stage-header"><div class="stage-name">可視ランタイムレシート</div></div>
+              <div class="stage-detail">
+                Kernel: ${health.service} v${health.version}<br>
+                Timestamp: ${health.timestamp}<br>
+                Arc entries: ${arc ? arc.entryCount : 'NOT_VISIBLE'}<br>
+                Arc path: ${health.arcPath}
+              </div>
+            </div>`;
+        } catch (_) { /* keep NOT_VISIBLE receipt */ }
+
+        return `
+          ${kernelReceipts}
+          <div class="stage-card">
+            <div class="stage-header"><div class="stage-icon frame">1</div><div class="stage-name">Execution</div></div>
+            <div class="stage-detail">Anthropic API（Kernel経由） / LangChain, vLLM, Dify: 未接続 → NOT_VISIBLE</div>
+          </div>
+          <div class="stage-card">
+            <div class="stage-header"><div class="stage-icon structure">2</div><div class="stage-name">Knowledge</div></div>
+            <div class="stage-detail">Arc JSONL stream / RAG, KG, PostgreSQL, S3: 未接続 → NOT_VISIBLE</div>
+          </div>
+          <div class="stage-card">
+            <div class="stage-header"><div class="stage-icon expression">3</div><div class="stage-name">Safety</div></div>
+            <div class="stage-detail">Evidence-first guard / Guardrails, Ragas: 未接続 → NOT_VISIBLE</div>
+          </div>
+          <div class="stage-card">
+            <div class="stage-header"><div class="stage-icon spark">4</div><div class="stage-name">Observation</div></div>
+            <div class="stage-detail">Arc commandReceipt / Portkey: 未接続 → NOT_VISIBLE</div>
+          </div>
+          <div class="stage-detail" style="margin-top:0.5rem;">レイヤー構成は設計リファレンス（静的）。実測値は可視レシートのみ表示。</div>`;
+      }
+    };
+
+    async function tryLocalCommand(message) {
+      // Normalize "/x" and host-local "-x" shorthand to slashless canonical form
+      const normalized = message.toLowerCase().replace(/^[/-]/, '').trim();
+      const handler = LOCAL_COMMANDS[normalized];
+      if (!handler) return false;
+
+      const content = await handler();
+      createPanel(`panel-${normalized.replace(/\s+/g, '-')}`, normalized.toUpperCase(), content);
+      addMessage('system', `"${normalized}" の結果をパネルに表示しました。`);
+      return true;
+    }
+
+    async function sendCommand() {
       const input = document.getElementById('commandInput');
       const message = input.value.trim();
 
       if (!message) return;
 
       addMessage('user', message);
-      sendMessage(message);
       input.value = '';
+
+      if (await tryLocalCommand(message)) return;
+
+      // Normalize hyphen shorthand before dispatching to the kernel router
+      const outbound = message.replace(/^-(?=\S)/, '/');
+      sendMessage(outbound);
     }
 
     // Event listeners

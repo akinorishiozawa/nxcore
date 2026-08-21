@@ -325,12 +325,29 @@ const ARMS_ENTRIES = {
     category: 'monitor',
     role: 'View DecisionState history',
     output: 'Decision records'
+  },
+  'ops': {
+    id: 'CMD_OPS',
+    command: 'ops',
+    category: 'monitor',
+    role: 'View LLMOps layer architecture and runtime-visible status',
+    output: 'Layer reference plus visible runtime receipts'
+  },
+  'help': {
+    id: 'CMD_HELP',
+    command: 'help',
+    category: 'core',
+    role: 'List available Arms commands',
+    output: 'Command table generated from Arms.entries'
   }
 };
 
 // Command router
+// Canonical stored commands are slashless (Arms.coreContract.surfaceRule).
+// Runtime accepts "/cmd" (InfinityLang render) and "-cmd" (host-local
+// hyphen shorthand, RuntimeExecutionModel.codingAgentEnvironment).
 function routeCommand(input) {
-  const normalized = input.trim().toLowerCase().replace(/^\//, '');
+  const normalized = input.trim().toLowerCase().replace(/^[/-]/, '');
 
   for (const [cmd, entry] of Object.entries(ARMS_ENTRIES)) {
     if (normalized === cmd || normalized.startsWith(cmd + ' ')) {
@@ -426,6 +443,14 @@ async function handleCommand(ws, route) {
 
     case 'decision':
       response = await executeDecisionCommand();
+      break;
+
+    case 'ops':
+      response = await executeOpsCommand(args);
+      break;
+
+    case 'help':
+      response = executeHelpCommand();
       break;
 
     default:
@@ -531,6 +556,48 @@ async function executeDecisionCommand() {
   } catch (error) {
     return '# DecisionState History\n\nNo decisions found.';
   }
+}
+
+// ops: layer architecture reference plus runtime-visible receipts only.
+// Evidence-first (GlobalBehavior.evidenceFirst): metrics this process cannot
+// observe are rendered as NOT_VISIBLE, never invented.
+async function executeOpsCommand(args) {
+  const mem = process.memoryUsage();
+  const uptimeSec = Math.floor(process.uptime());
+
+  let arcEntryCount = 'NOT_VISIBLE';
+  try {
+    const content = await fs.readFile(ARC_STREAM_PATH, 'utf8');
+    arcEntryCount = String(content.trim().split('\n').filter(Boolean).length);
+  } catch (_) { /* Arc file absent: keep NOT_VISIBLE */ }
+
+  return `# LLMOps Status (${args || 'all'})
+
+## 可視ランタイムレシート（このプロセスの実測値）
+- Kernel: nxcore-kernel-server v${SSOT_VERSION}
+- Uptime: ${uptimeSec}s
+- Memory (RSS): ${(mem.rss / 1024 / 1024).toFixed(1)} MB
+- LLM Host: claude-sonnet-4-5-20250929 (Anthropic API)
+- Arc entries (today): ${arcEntryCount}
+- Arc path: ${ARC_STREAM_PATH}
+
+## レイヤー構成（設計リファレンス — 静的）
+1. **Execution**: Anthropic API (active) / LangChain, vLLM, Dify (未接続 → NOT_VISIBLE)
+2. **Knowledge**: Arc JSONL stream (active) / RAG, KG, PostgreSQL, S3 (未接続 → NOT_VISIBLE)
+3. **Safety**: Evidence-first guard (active) / Guardrails, Ragas (未接続 → NOT_VISIBLE)
+4. **Observation**: Arc commandReceipt (active) / Portkey (未接続 → NOT_VISIBLE)
+
+外部レイヤーの実測値は、該当サービスへの接続レシートが可視になるまで NOT_VISIBLE です。`;
+}
+
+// help: generated from ARMS_ENTRIES so the table cannot drift from the router.
+function executeHelpCommand() {
+  let response = '# Arms Commands\n\n| Command | Category | Role |\n|---|---|---|\n';
+  for (const entry of Object.values(ARMS_ENTRIES)) {
+    response += `| /${entry.command} | ${entry.category} | ${entry.role} |\n`;
+  }
+  response += '\nコマンドは `/x` または `-x` 形式で入力できます。それ以外の入力はLLM対話として処理されます。';
+  return response;
 }
 
 // Handle normal conversation

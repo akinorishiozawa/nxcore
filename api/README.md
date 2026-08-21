@@ -55,12 +55,14 @@ Append-only ledger stored in `./arc/arc_stream_YYYY-MM-DD.jsonl`:
 
 #### Arms Commands
 
-Built-in commands per `Arms.entries`:
+Built-in commands per `Arms.entries` (accepted as `/cmd` or host-local `-cmd`):
 
 - `/quest` - Start guided dialogue flow
 - `/think` - Execute ThinkCore pipeline explicitly
 - `/arc` - View Arc event stream
 - `/decision` - View DecisionState history
+- `/ops` - LLMOps layer reference + runtime-visible receipts (unconnected layers render NOT_VISIBLE)
+- `/help` - Command table generated from Arms.entries
 
 ### Evidence-First Principle
 

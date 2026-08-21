@@ -1,5 +1,9 @@
 # Dependencies
 node_modules/
+package-lock.json
+
+# Arc runtime stream (append-only runtime data, not source)
+arc/
 
 # Environment variables
 .env

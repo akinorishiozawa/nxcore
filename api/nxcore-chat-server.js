@@ -1,3 +1,5 @@
+// LEGACY — superseded by nxcore-kernel-server.js (SSOT v3.10.02).
+// Kept for compatibility via `npm run start:legacy`. Do not extend.
 const express = require('express');
 const { createServer } = require('http');
 const { WebSocketServer } = require('ws');

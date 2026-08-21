@@ -38,12 +38,14 @@ Browse append-only memory ledger:
 
 ### Arms Commands
 
-Execute NXCORE commands via `/` prefix:
+Execute NXCORE commands via `/` prefix (host-local `-` shorthand also accepted):
 
 - `/quest` - Start guided dialogue
 - `/think <text>` - Explicit ThinkCore execution
 - `/arc` - View Arc stream
 - `/decision` - View DecisionState history
+- `/ops all` - LLMOps layer panel (local fallback works without kernel; live metrics show NOT_VISIBLE when unconnected)
+- `/help` - Command table from Arms.entries
 
 ## Files
 

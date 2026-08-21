@@ -1,11 +1,13 @@
 {
-  "name": "nxcore-chat-server",
-  "version": "1.0.0",
-  "description": "WebSocket server for nxcore OS real-time LLM conversation",
-  "main": "nxcore-chat-server.js",
+  "name": "nxcore-kernel-server",
+  "version": "3.10.02",
+  "description": "NXCORE Cognitive OS Kernel Server - SSOT v3.10.02 compliant",
+  "main": "nxcore-kernel-server.js",
   "scripts": {
-    "start": "node nxcore-chat-server.js",
-    "dev": "nodemon nxcore-chat-server.js"
+    "start": "node nxcore-kernel-server.js",
+    "start:legacy": "node nxcore-chat-server.js",
+    "dev": "nodemon nxcore-kernel-server.js",
+    "dev:legacy": "nodemon nxcore-chat-server.js"
   },
   "keywords": [
     "nxcore",

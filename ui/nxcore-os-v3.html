@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NXCORE OS v3.10.02</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* macOS Dark Theme */
+      --bg-space: #1e1e1e;
+      --bg-panel: rgba(44, 44, 44, 0.85);
+      --bg-panel-solid: #2c2c2c;
+      --bg-panel-hover: rgba(58, 58, 58, 0.85);
+      --bg-titlebar: rgba(40, 40, 40, 0.95);
+      --accent-blue: #007AFF;
+      --accent-purple: #BF5AF2;
+      --accent-green: #30D158;
+      --accent-red: #FF453A;
+      --accent-yellow: #FFD60A;
+      --accent-orange: #FF9500;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.65);
+      --text-dim: rgba(255, 255, 255, 0.4);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(0, 0, 0, 0.5);
+      --traffic-red: #FF5F57;
+      --traffic-yellow: #FFBD2E;
+      --traffic-green: #28C840;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg-space: #f5f5f7;
+        --bg-panel: rgba(255, 255, 255, 0.85);
+        --bg-panel-solid: #ffffff;
+        --bg-panel-hover: rgba(242, 242, 247, 0.85);
+        --bg-titlebar: rgba(250, 250, 250, 0.95);
+        --text-primary: #000000;
+        --text-secondary: rgba(0, 0, 0, 0.65);
+        --text-dim: rgba(0, 0, 0, 0.4);
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow: rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+      background: var(--bg-space);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    code, .mono {
+      font-family: 'SF Mono', 'JetBrains Mono', 'Space Mono', monospace;
+    }
+
+    /* Header */
+    .header {
+      background: var(--bg-titlebar);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .version-badge {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: 'SF Mono', monospace;
+      background: var(--bg-panel);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    .status-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.connected { background: var(--accent-green); }
+    .status-dot.disconnected { background: var(--accent-red); animation: none; }
+    .status-dot.connecting { background: var(--accent-yellow); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Main area */
+    .main-area {
+      flex: 1;
+      overflow: auto;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 1rem;
+      align-content: start;
+    }
+
+    /* Command bar */
+    .command-bar {
+      background: var(--bg-titlebar);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    #commandInput {
+      flex: 1;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    #commandInput:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    #sendButton {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #sendButton:hover { background: #0051D5; }
+    #sendButton:active { transform: scale(0.98); }
+
+    /* Panel */
+    .panel {
+      background: var(--bg-panel);
+      backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 600px;
+    }
+
+    .panel-header {
+      background: var(--bg-titlebar);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-traffic-lights {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .traffic-light.red { background: var(--traffic-red); }
+    .traffic-light.yellow { background: var(--traffic-yellow); }
+    .traffic-light.green { background: var(--traffic-green); }
+    .traffic-light:hover { opacity: 0.8; }
+
+    .panel-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .panel-content {
+      padding: 1rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Messages */
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .message-role {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .message.user .message-role { color: var(--accent-blue); }
+    .message.assistant .message-role { color: var(--accent-purple); }
+    .message.system .message-role { color: var(--accent-orange); }
+
+    .message-content {
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .message.user .message-content { border-left: 3px solid var(--accent-blue); }
+    .message.assistant .message-content { border-left: 3px solid var(--accent-purple); }
+    .message.system .message-content { border-left: 3px solid var(--accent-orange); }
+
+    /* ThinkCore stages */
+    .stage-card {
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stage-icon.spark { background: var(--accent-purple); }
+    .stage-icon.frame { background: var(--accent-blue); }
+    .stage-icon.structure { background: var(--accent-green); }
+    .stage-icon.expression { background: var(--accent-yellow); color: #000; }
+
+    .stage-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stage-detail {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Arc entries */
+    .arc-entry {
+      background: var(--bg-panel-solid);
+      border-left: 3px solid var(--accent-green);
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .arc-timestamp {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: 'SF Mono', monospace;
+    }
+
+    .arc-action {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 0.25rem;
+    }
+
+    .arc-tags {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    /* Next actions */
+    .next-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .action-button {
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .action-button:hover {
+      background: var(--bg-panel-hover);
+      border-color: var(--accent-blue);
+    }
+
+    .action-label {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .action-command {
+      font-family: 'SF Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>NXCORE OS</span>
+      <span class="version-badge">v3.10.02</span>
+    </div>
+    <div class="status-group">
+      <div class="status-item">
+        <span class="status-dot" id="wsStatusDot"></span>
+        <span id="wsStatusText">接続中...</span>
+      </div>
+      <div class="status-item">
+        <span class="mono">Arc</span>
+        <span id="arcStatus">-</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area" id="mainArea"></div>
+
+  <div class="command-bar">
+    <input
+      type="text"
+      id="commandInput"
+      placeholder="コマンドまたは質問を入力... (/quest, /think, /arc, /decision)"
+    />
+    <button id="sendButton">送信</button>
+  </div>
+
+  <script>
+    // WebSocket connection
+    let ws = null;
+    let wsReconnectTimer = null;
+    const WS_URL = 'ws://localhost:3000';
+
+    function updateWSStatus(status) {
+      const dot = document.getElementById('wsStatusDot');
+      const text = document.getElementById('wsStatusText');
+
+      dot.className = 'status-dot';
+      if (status === 'connected') {
+        dot.classList.add('connected');
+        text.textContent = 'Kernel接続済み';
+      } else if (status === 'connecting') {
+        dot.classList.add('connecting');
+        text.textContent = '接続中...';
+      } else {
+        dot.classList.add('disconnected');
+        text.textContent = 'Kernel未接続';
+      }
+    }
+
+    function connectWebSocket() {
+      if (ws && ws.readyState === WebSocket.OPEN) return;
+
+      updateWSStatus('connecting');
+
+      try {
+        ws = new WebSocket(WS_URL);
+
+        ws.onopen = () => {
+          console.log('WebSocket connected');
+          updateWSStatus('connected');
+          if (wsReconnectTimer) {
+            clearTimeout(wsReconnectTimer);
+            wsReconnectTimer = null;
+          }
+          showBootMessage();
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleWSMessage(data);
+          } catch (error) {
+            console.error('Failed to parse WebSocket message:', error);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          updateWSStatus('disconnected');
+        };
+
+        ws.onclose = () => {
+          console.log('WebSocket disconnected');
+          updateWSStatus('disconnected');
+          ws = null;
+          wsReconnectTimer = setTimeout(connectWebSocket, 5000);
+        };
+      } catch (error) {
+        console.error('Failed to create WebSocket:', error);
+        updateWSStatus('disconnected');
+      }
+    }
+
+    function showBootMessage() {
+      addMessage('system', `# NXCORE COGNITIVE OS — ACTIVE
+
+Version: 3.10.02
+Kernel Release: nxcore-kernel-v3.10.02
+SSOT: v3.10.02
+
+## CoreModel
+- Role: 構造化された、追跡可能な、人間中心の思考OS
+- Player: 最終権限者
+- Components: Arms, Arc, Tags, Profile, Mode
+
+## ThinkCore Pipeline
+Spark → Frame → Structure → Expression
+
+## OutputContract
+Answer | Artifact | NextActions
+
+## Next Actions
+- /quest - 対話を開始
+- /think - ThinkCore実行
+- /arc - Arcストリーム表示`);
+    }
+
+    let currentStreamingMessage = null;
+
+    function handleWSMessage(data) {
+      if (data.type === 'status' && data.status === 'processing') {
+        currentStreamingMessage = null;
+      } else if (data.type === 'stream') {
+        if (!currentStreamingMessage) {
+          currentStreamingMessage = addMessage('assistant', data.partial);
+        } else {
+          updateMessage(currentStreamingMessage, data.partial);
+        }
+      } else if (data.type === 'complete') {
+        if (currentStreamingMessage) {
+          updateMessage(currentStreamingMessage, data.text);
+        } else {
+          addMessage('assistant', data.text);
+        }
+
+        // Show metadata if available
+        if (data.metadata) {
+          if (data.metadata.thinkCore) {
+            showThinkCoreStages(data.metadata.thinkCore);
+          }
+          if (data.metadata.nextActions) {
+            showNextActions(data.metadata.nextActions);
+          }
+        }
+
+        currentStreamingMessage = null;
+      } else if (data.type === 'error') {
+        addMessage('system', `エラー: ${data.error}`);
+        currentStreamingMessage = null;
+      }
+    }
+
+    function sendMessage(message) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        addMessage('system', 'Kernel未接続。サーバーを起動してください。\n\n```bash\ncd api\nnpm start\n```');
+        return false;
+      }
+
+      ws.send(JSON.stringify({
+        type: 'chat',
+        message: message
+      }));
+      return true;
+    }
+
+    // Panel management
+    let chatPanelId = 'panel-chat';
+    let thinkCorePanelId = 'panel-thinkcore';
+    let nextActionsPanelId = 'panel-nextactions';
+
+    function createPanel(id, title, content) {
+      let panel = document.getElementById(id);
+
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.className = 'panel';
+        panel.id = id;
+        panel.innerHTML = `
+          <div class="panel-header">
+            <div class="panel-traffic-lights">
+              <button class="traffic-light red" onclick="closePanel('${id}')"></button>
+              <button class="traffic-light yellow"></button>
+              <button class="traffic-light green"></button>
+            </div>
+            <div class="panel-title">${title}</div>
+            <div style="width: 3rem;"></div>
+          </div>
+          <div class="panel-content" id="${id}-content"></div>
+        `;
+        document.getElementById('mainArea').appendChild(panel);
+      }
+
+      const contentDiv = document.getElementById(`${id}-content`);
+      if (contentDiv) {
+        contentDiv.innerHTML = content;
+      }
+
+      return panel;
+    }
+
+    function closePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.style.opacity = '0';
+        setTimeout(() => panel.remove(), 200);
+      }
+    }
+
+    function createChatPanel() {
+      const panel = createPanel(
+        chatPanelId,
+        '対話履歴',
+        '<div class="chat-messages" id="chatMessages"></div>'
+      );
+
+      // Move to first position
+      const mainArea = document.getElementById('mainArea');
+      if (panel !== mainArea.firstChild) {
+        mainArea.insertBefore(panel, mainArea.firstChild);
+      }
+    }
+
+    function addMessage(role, content) {
+      if (!document.getElementById(chatPanelId)) {
+        createChatPanel();
+      }
+
+      const messagesContainer = document.getElementById('chatMessages');
+      if (!messagesContainer) return null;
+
+      const message = document.createElement('div');
+      message.className = `message ${role}`;
+      message.innerHTML = `
+        <div class="message-role">${role === 'user' ? 'Player' : role === 'assistant' ? 'NXCORE' : 'System'}</div>
+        <div class="message-content">${content}</div>
+      `;
+      messagesContainer.appendChild(message);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      return message;
+    }
+
+    function updateMessage(messageElement, content) {
+      if (!messageElement) return;
+
+      const contentDiv = messageElement.querySelector('.message-content');
+      if (contentDiv) {
+        contentDiv.textContent = content;
+      }
+
+      const messagesContainer = document.getElementById('chatMessages');
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+
+    function showThinkCoreStages(stages) {
+      if (!stages) return;
+
+      const stagesHTML = `
+        <div class="stage-card">
+          <div class="stage-header">
+            <div class="stage-icon spark">S</div>
+            <div class="stage-name">Spark（発火）</div>
+          </div>
+          <div class="stage-detail">
+            Pressure Point: ${stages.spark?.pressurePoint || 'N/A'}
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-header">
+            <div class="stage-icon frame">F</div>
+            <div class="stage-name">Frame（枠組み）</div>
+          </div>
+          <div class="stage-detail">
+            Goal: ${stages.frame?.goalThisTurn || 'N/A'}<br>
+            Perspective: ${stages.frame?.perspective || 'N/A'}
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-header">
+            <div class="stage-icon structure">S</div>
+            <div class="stage-name">Structure（構造）</div>
+          </div>
+          <div class="stage-detail">
+            Approach: ${stages.structure?.approach || 'N/A'}
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-header">
+            <div class="stage-icon expression">E</div>
+            <div class="stage-name">Expression（表現）</div>
+          </div>
+          <div class="stage-detail">
+            OutputContract: Answer, NextActions
+          </div>
+        </div>
+      `;
+
+      createPanel(thinkCorePanelId, 'ThinkCore Pipeline', stagesHTML);
+    }
+
+    function showNextActions(actions) {
+      if (!actions || actions.length === 0) return;
+
+      let actionsHTML = '<div class="next-actions">';
+
+      for (const action of actions) {
+        actionsHTML += `
+          <button class="action-button" onclick="executeAction('${action.command}')">
+            <span class="action-label">${action.label}</span>
+            <span class="action-command">/${action.command}</span>
+          </button>
+        `;
+      }
+
+      actionsHTML += '</div>';
+
+      createPanel(nextActionsPanelId, 'Next Actions', actionsHTML);
+    }
+
+    function executeAction(command) {
+      const input = document.getElementById('commandInput');
+      input.value = `/${command}`;
+      sendCommand();
+    }
+
+    function sendCommand() {
+      const input = document.getElementById('commandInput');
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      addMessage('user', message);
+      sendMessage(message);
+      input.value = '';
+    }
+
+    // Event listeners
+    document.getElementById('commandInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendCommand();
+      }
+    });
+
+    document.getElementById('sendButton').addEventListener('click', sendCommand);
+
+    // Initialize
+    window.addEventListener('load', () => {
+      createChatPanel();
+      connectWebSocket();
+    });
+  </script>
+</body>
+</html>
